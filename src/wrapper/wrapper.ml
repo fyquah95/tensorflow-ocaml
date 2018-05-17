@@ -309,6 +309,18 @@ module Status = struct
         (Printf.sprintf "%d %s" (tf_getcode status) (message status))
 end
 
+let live_strings = ref []
+
+let ptr_of_string str =
+    let len = String.length str in
+    let carray = CArray.make Ctypes.char (1 + len) in
+    live_strings := carray :: !live_strings;
+    String.iteri (fun i char -> CArray.set carray i char) str;
+    CArray.set carray len '\x00';
+    CArray.start carray
+;;
+
+
 module Buffer = struct
   module Tf_buffer = C.Tf_buffer
   type t = Tf_buffer.t
@@ -356,16 +368,6 @@ module Graph = struct
   type operation_description = Tf_graph.t * Tf_operationdescription.t
 
   type output = Tf_output.t structure
-
-  let live_strings = ref []
-
-  let ptr_of_string str =
-    let len = String.length str in
-    let carray = CArray.make Ctypes.char (1 + len) in
-    live_strings := carray :: !live_strings;
-    String.iteri (fun i char -> CArray.set carray i char) str;
-    CArray.set carray len '\x00';
-    CArray.start carray
 
   let create_output (_graph, op) ~index =
     let output = make Tf_output.t in
@@ -579,6 +581,14 @@ module Session_options = struct
     let session_options = tf_newsessionoptions () in
     Gc.finalise tf_deletesessionoptions session_options;
     session_options
+
+  let set_config session_options proto =
+    let len = Unsigned.Size_t.of_int (String.length proto) in
+    let proto_ptr = Ctypes.to_voidp (ptr_of_string proto) in
+    let status = Status.create () in
+    tf_setconfig session_options proto_ptr len status;
+    Status.result_or_error status ()
+  ;;
 end
 
 module Session = struct

@@ -18,12 +18,6 @@ type data_type =
   | TF_UINT16
   | Unknown of int
 
-module Session_options : sig
-  type t
-
-  val create : unit -> t
-end
-
 module Status : sig
   type t
   type code =
@@ -55,6 +49,14 @@ module Status : sig
     | Error of t
 
   val ok_exn : 'a result -> 'a
+end
+
+module Session_options : sig
+  type t
+
+  val create : unit -> t
+
+  val set_config : t -> string -> unit Status.result
 end
 
 module Graph : sig

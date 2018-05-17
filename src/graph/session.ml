@@ -1,6 +1,35 @@
 open Base
 open Tensorflow_core
 
+module Options : sig
+  type t
+
+  val empty : t
+  val add_config  : t -> Protobuf.t -> t
+
+  val to_tf_session_option : t -> Wrapper.Session_options.t
+end = struct
+  type t =
+    { config : Protobuf.t option;
+    }
+
+  let empty = { config = None }
+
+  let add_config t config =
+    { config = Some config }
+  ;;
+
+  let to_tf_session_option t =
+    let sess_opt = Wrapper.Session_options.create () in
+    Option.iter t.config ~f:(fun config ->
+      Wrapper.Session_options.set_config sess_opt
+        (Protobuf.to_string config)
+      |> Wrapper.Status.ok_exn
+    );
+    sess_opt
+  ;;
+end
+
 type t =
   { session : Wrapper.Session.t
   ; graph : Wrapper.Graph.t
@@ -9,9 +38,12 @@ type t =
   ; mutable variable_initializations : Wrapper.Graph.operation list
   }
 
-let create () =
+let create ?options () =
   let graph = Wrapper.Graph.create () in
-  match Wrapper.Session.create graph with
+  let session_options =
+    Option.map ~f:Options.to_tf_session_option options
+  in
+  match Wrapper.Session.create ?session_options graph with
   | Error status ->
     Printf.failwithf "Unable to generate session: %s" (Wrapper.Status.message status) ()
   | Ok session ->
@@ -94,6 +126,18 @@ let shape ?session node =
 module Input = struct
    type t =
    | I : _ Ops.Placeholder.t * (_,_) Tensor.t -> t
+
+  let int32
+        (node : [ `int32 ] Ops.Placeholder.t)
+        (tensor : (int32, Bigarray.int32_elt) Tensor.t)
+    =
+    I (node, tensor)
+
+  let int64
+        (node : [ `int64 ] Ops.Placeholder.t)
+        (tensor : (int64, Bigarray.int64_elt) Tensor.t)
+    =
+    I (node, tensor)
 
   let float
         (node : [ `float ] Ops.Placeholder.t)

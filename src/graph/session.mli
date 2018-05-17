@@ -1,10 +1,19 @@
 open Tensorflow_core
 type t
 
-val create : unit -> t
+module Options : sig
+  type t
+
+  val empty : t
+  val add_config : t -> Protobuf.t -> t
+end
+
+val create : ?options:Options.t -> unit -> t
 
 module Input : sig
   type t
+  val int32  : [ `int32 ] Ops.Placeholder.t -> (int32, Bigarray.int32_elt) Tensor.t -> t
+  val int64  : [ `int64 ] Ops.Placeholder.t -> (int64, Bigarray.int64_elt) Tensor.t -> t
   val float  : [ `float ] Ops.Placeholder.t -> (float, Bigarray.float32_elt) Tensor.t -> t
   val double : [ `double ] Ops.Placeholder.t -> (float, Bigarray.float64_elt) Tensor.t -> t
   val bool   : [ `bool ] Ops.Placeholder.t -> (int, Bigarray.int8_unsigned_elt) Tensor.t -> t
