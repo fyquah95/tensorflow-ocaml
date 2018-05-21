@@ -3,7 +3,7 @@
 (library
  ((name tensorflow_core)
   (public_name tensorflow.core)
-  (c_names (tf_stubs))
+  (c_names (tf_stubs fyp))
   (c_library_flags (-ltensorflow))
   (no_dynlink)
   (modes (native))

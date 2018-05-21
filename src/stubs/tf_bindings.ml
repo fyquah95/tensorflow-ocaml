@@ -99,6 +99,9 @@ module C(F: Cstubs.FOREIGN) = struct
     type t = unit ptr
     let t : t typ = ptr void
 
+    let tf_newbuffer =
+      foreign "TF_NewBuffer" (void @-> returning t)
+
     let tf_newbufferfromstring =
       foreign "TF_NewBufferFromString" (string @-> int @-> returning t)
 
@@ -109,6 +112,13 @@ module C(F: Cstubs.FOREIGN) = struct
   module Tf_graph = struct
     type t = unit ptr
     let t : t typ = ptr void
+
+    let tf_graphtographdef =
+      foreign "TF_GraphToGraphDef"
+        (t
+         @-> Tf_buffer.t
+         @-> Tf_status.t
+         @-> returning void)
 
     let tf_newgraph =
       foreign "TF_NewGraph" (void @-> returning t)

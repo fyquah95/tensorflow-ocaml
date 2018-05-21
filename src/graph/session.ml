@@ -38,6 +38,14 @@ type t =
   ; mutable variable_initializations : Wrapper.Graph.operation list
   }
 
+let dump_graph_def t =
+  match Wrapper.Graph.dump_graph_def t.graph with
+  | Error status ->
+    Printf.failwithf "Unable to dump graph def: %s"
+      (Wrapper.Status.message status) ()
+  | Ok def ->
+    Protobuf.of_string def
+
 let create ?options () =
   let graph = Wrapper.Graph.create () in
   let session_options =
