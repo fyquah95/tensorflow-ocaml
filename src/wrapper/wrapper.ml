@@ -335,7 +335,12 @@ module Buffer = struct
     Gc.finalise Tf_buffer.tf_deletebuffer t;
     (t : t)
 
-  external to_string : t -> string = "FYP__TF_Buffer_to_caml_string"
+  let to_string t =
+    let length = Tf_buffer.tf_bufferlength t |> Unsigned.Size_t.to_int in
+    let carray = CArray.make Ctypes.char (1 + length) in
+    Tf_buffer.tf_buffercopydata t (CArray.start carray);
+    String.init length (fun i -> CArray.get carray i)
+  ;;
 end
 
 module Graph_import = struct
