@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "c_api.h"  // tensorflow
 
 extern const void * TF_BufferData(TF_Buffer *t)
