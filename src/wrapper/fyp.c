@@ -1,11 +1,11 @@
 #include "c_api.h"  // tensorflow
-#include "ctypes_cstubs_internals.h"
 
-#include <caml/mlvalues.h>
-#include <caml/alloc.h>
-
-extern value FYP__TF_Buffer_to_caml_string(value v1)
+extern const void * TF_BufferData(TF_Buffer *t)
 {
-  TF_Buffer *t = (void*) CTYPES_ADDR_OF_FATPTR(v1);
-  return caml_alloc_initialized_string(t->length, t->data);
+  return t->data;
+}
+
+extern size_t TF_BufferLength(TF_Buffer *t)
+{
+  return t->length;
 }

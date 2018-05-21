@@ -107,6 +107,18 @@ module C(F: Cstubs.FOREIGN) = struct
 
     let tf_deletebuffer =
       foreign "TF_DeleteBuffer" (t @-> returning void)
+
+    let tf_bufferLength =
+      foreign "TF_BufferData"
+        (t
+         @-> t
+         @-> returning (ptr void))
+
+    let tf_buffertostring =
+      foreign "TF_BufferLength"
+        (t
+         @-> t
+         @-> returning size_t)
   end
 
   module Tf_graph = struct
