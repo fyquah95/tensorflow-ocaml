@@ -335,7 +335,7 @@ module Buffer = struct
     Gc.finalise Tf_buffer.tf_deletebuffer t;
     (t : t)
 
-  external to_string : t -> string = "Caml_TF_Buffer_to_string"
+  external to_string : t -> string = "FYP__TF_Buffer_to_caml_string"
 end
 
 module Graph_import = struct
