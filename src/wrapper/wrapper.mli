@@ -194,6 +194,8 @@ module Graph : sig
     -> output list
     -> xs:output list
     -> output list Status.result
+
+  val dump_graph_def : t -> string Status.result
 end
 
 module Session : sig

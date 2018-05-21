@@ -329,6 +329,13 @@ module Buffer = struct
     let t = Tf_buffer.tf_newbufferfromstring str (String.length str) in
     Gc.finalise Tf_buffer.tf_deletebuffer t;
     (t : t)
+
+  let create () =
+    let t = Tf_buffer.tf_newbuffer () in
+    Gc.finalise Tf_buffer.tf_deletebuffer t;
+    (t : t)
+
+  external to_string : t -> string = "Caml_TF_Buffer_to_string"
 end
 
 module Graph_import = struct
@@ -572,6 +579,15 @@ module Graph = struct
     match Status.result_or_error status () with
     | Ok () -> Status.Ok (CArray.to_list dys)
     | Error _ as err -> err
+
+  let dump_graph_def t =
+    let buffer = Buffer.create () in
+    let status = Status.create () in
+    Tf_graph.tf_graphtographdef t buffer status;
+    match Status.result_or_error status () with
+    | Ok () -> Status.Ok (Buffer.to_string buffer)
+    | Error _ as err -> err
+
 end
 
 module Session_options = struct

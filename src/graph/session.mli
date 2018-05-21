@@ -10,6 +10,8 @@ end
 
 val create : ?options:Options.t -> unit -> t
 
+val dump_graph_def : t -> Protobuf.t
+
 module Input : sig
   type t
   val int32  : [ `int32 ] Ops.Placeholder.t -> (int32, Bigarray.int32_elt) Tensor.t -> t
